@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearTrace — E-Waste Compliance Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0F0D;
+  --surface:#141714;
+  --surface2:#1C1F1C;
+  --surface3:#222622;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --green:#22C97A;
+  --green-dark:#16A05E;
+  --green-dim:rgba(34,201,122,0.12);
+  --green-dim2:rgba(34,201,122,0.06);
+  --text:#F0F4F0;
+  --text2:#8A9E8A;
+  --text3:#4A5A4A;
+  --amber:#F5A623;
+  --amber-dim:rgba(245,166,35,0.12);
+  --red:#E05555;
+  --red-dim:rgba(224,85,85,0.1);
+  --blue:#4A9EF5;
+  --blue-dim:rgba(74,158,245,0.1);
+  --radius:10px;
+  --radius-lg:16px;
+  --radius-xl:20px;
+  --shadow:0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.6);
+}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;overflow:hidden}
+
+/* APP SHELL */
+#app{display:flex;height:100vh}
+
+/* SIDEBAR */
+#sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:22px 18px 18px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#0D0F0D;font-weight:700;flex-shrink:0}
+.logo-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.02em}
+.logo-tag{font-size:10px;color:var(--text3);margin-top:1px;font-weight:400}
+.sb-nav{padding:10px 8px;flex:1}
+.nav-sect{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:14px 10px 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:400;color:var(--text2);transition:all 0.15s;margin-bottom:1px;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--green-dim);color:var(--green);font-weight:500}
+.nav-item i{font-size:15px;flex-shrink:0}
+.nav-dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.sb-bottom{padding:12px 16px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:9px}
+.user-av{width:28px;height:28px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--green);flex-shrink:0}
+.user-name{font-size:11px;font-weight:500;color:var(--text)}
+.user-co{font-size:10px;color:var(--text3)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 22px;flex-shrink:0}
+.tb-title{font-size:14px;font-weight:600;color:var(--text);flex:1;letter-spacing:-0.01em}
+.tb-badge{background:var(--green-dim);color:var(--green);font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid rgba(34,201,122,0.2)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text);transition:all 0.15s;white-space:nowrap}
+.btn:hover{background:var(--surface3);border-color:rgba(255,255,255,0.18)}
+.btn:active{transform:scale(0.98)}
+.btn-green{background:var(--green);border-color:var(--green);color:#0D0F0D;font-weight:600}
+.btn-green:hover{background:#1DB86E;border-color:#1DB86E}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--text2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;padding:22px}
+.page{display:none;animation:fadeUp .18s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-title{font-size:12px;font-weight:600;color:var(--text);letter-spacing:-0.01em}
+.card-body{padding:18px}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;position:relative;overflow:hidden}
+.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)}
+.metric.amber::before{background:var(--amber)}
+.metric.blue::before{background:var(--blue)}
+.metric.red::before{background:var(--red)}
+.metric-val{font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.03em;font-family:'Sora',sans-serif}
+.metric-label{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.metric-sub{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+th{text-align:left;padding:10px 14px;font-size:10px;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.05em;background:var(--surface2)}
+td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--surface2)}
+
+/* STATUS */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.pill::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+.p-intake{background:var(--blue-dim);color:var(--blue)}
+.p-process{background:var(--amber-dim);color:var(--amber)}
+.p-wiped{background:var(--green-dim);color:var(--green)}
+.p-certified{background:rgba(34,201,122,0.2);color:var(--green)}
+.p-dispatched{background:var(--surface3);color:var(--text2)}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.form-control{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius);font-size:12px;font-family:inherit;color:var(--text);background:var(--surface2);outline:none;transition:border-color .15s,box-shadow .15s}
+.form-control:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,201,122,0.12)}
+.form-control::placeholder{color:var(--text3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* STEPS */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.step-item{display:flex;align-items:center;flex:1}
+.step-bubble{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text3);background:var(--surface2);flex-shrink:0;transition:all .2s}
+.step-bubble.done{background:var(--green);border-color:var(--green);color:#0D0F0D}
+.step-bubble.active{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.step-label{font-size:10px;color:var(--text3);margin-left:8px;white-space:nowrap;font-weight:500}
+.step-label.active{color:var(--green)}
+.step-label.done{color:var(--text2)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 8px}
+.step-line.done{background:var(--green)}
+
+/* ASSET ROW INPUT */
+.asset-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.asset-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center}
+.asset-row input{padding:7px 10px;font-size:11px}
+.remove-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.remove-btn:hover{background:var(--red-dim);color:var(--red);border-color:var(--red)}
+
+/* CERTIFICATE PREVIEW */
+#cert-preview{display:none}
+.cert-paper{background:#fff;color:#1a1a1a;border-radius:var(--radius-lg);padding:40px;font-family:'Sora',sans-serif;position:relative;overflow:hidden;box-shadow:var(--shadow-lg)}
+.cert-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:80px;font-weight:700;color:rgba(34,201,122,0.05);white-space:nowrap;pointer-events:none;letter-spacing:-0.03em}
+.cert-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #22C97A}
+.cert-logo-area{display:flex;align-items:center;gap:10px}
+.cert-logo-box{width:36px;height:36px;background:#22C97A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff}
+.cert-company{font-size:16px;font-weight:700;color:#0D0F0D;letter-spacing:-0.02em}
+.cert-co-tag{font-size:10px;color:#666;margin-top:1px}
+.cert-id-box{text-align:right}
+.cert-id{font-family:'JetBrains Mono',monospace;font-size:11px;color:#22C97A;font-weight:500}
+.cert-date{font-size:10px;color:#888;margin-top:3px}
+.cert-title-area{text-align:center;margin-bottom:28px}
+.cert-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,201,122,0.1);border:1px solid rgba(34,201,122,0.3);border-radius:20px;padding:4px 14px;font-size:10px;font-weight:600;color:#16A05E;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.cert-main-title{font-size:22px;font-weight:700;color:#0D0F0D;letter-spacing:-0.02em;margin-bottom:4px}
+.cert-sub{font-size:12px;color:#666}
+.cert-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.cert-meta-item{background:#F8FAF8;border-radius:8px;padding:12px 14px;border:1px solid #E8EEE8}
+.cert-meta-label{font-size:9px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.cert-meta-value{font-size:12px;font-weight:600;color:#1a1a1a}
+.cert-assets-title{font-size:11px;font-weight:600;color:#333;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}
+.cert-asset-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:24px}
+.cert-asset-table th{text-align:left;padding:7px 10px;background:#F0F4F0;color:#555;font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #E0E8E0}
+.cert-asset-table td{padding:8px 10px;border-bottom:1px solid #EEF2EE;color:#333}
+.cert-asset-table tr:last-child td{border-bottom:none}
+.cert-compliance{background:#F0FAF5;border:1px solid #C0E8D0;border-radius:8px;padding:14px;margin-bottom:20px;font-size:11px;color:#1a6640;line-height:1.6}
+.cert-footer{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding-top:20px;border-top:1px solid #E8EEE8}
+.cert-sign-box{text-align:center}
+.cert-sign-line{border-top:1px solid #CCC;margin-bottom:6px;padding-top:6px}
+.cert-sign-name{font-size:10px;font-weight:600;color:#333}
+.cert-sign-role{font-size:9px;color:#888}
+.cert-verify{background:#0D0F0D;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;margin-top:16px}
+.cert-verify-text{font-size:10px;color:#8A9E8A}
+.cert-verify-code{font-family:'JetBrains Mono',monospace;font-size:10px;color:#22C97A;margin-left:auto}
+
+/* ACTIVITY */
+.activity-list{list-style:none}
+.act-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0}
+.act-main{font-size:12px;color:var(--text)}
+.act-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-xl);width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-title{font-size:14px;font-weight:600;color:var(--text)}
+.modal-body{padding:22px}
+.modal-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--green);color:var(--text);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;display:flex;align-items:center;gap:8px}
+#toast .t-icon{color:var(--green);font-size:15px}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+
+code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--surface2);padding:1px 6px;border-radius:5px;color:var(--green)}
+
+.divider{height:1px;background:var(--border);margin:18px 0}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:10px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);font-weight:500}
+
+/* WIPE METHOD */
+.wipe-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.wipe-option{border:1.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;transition:all .15s}
+.wipe-option:hover{border-color:var(--border2);background:var(--surface2)}
+.wipe-option.selected{border-color:var(--green);background:var(--green-dim)}
+.wipe-option-name{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
+.wipe-option-desc{font-size:10px;color:var(--text3)}
+.wipe-option.selected .wipe-option-name{color:var(--green)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">C</div>
+      <div>
+        <div class="logo-name">ClearTrace</div>
+        <div class="logo-tag">E-Waste Compliance</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-sect">Operations</div>
+    <div class="nav-item active" data-page="dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+    <div class="nav-item" data-page="intake"><i class="ti ti-package-import"></i> Asset Intake <span class="nav-dot"></span></div>
+    <div class="nav-item" data-page="processing"><i class="ti ti-cpu"></i> Processing</div>
+    <div class="nav-item" data-page="certificates"><i class="ti ti-certificate"></i> Certificates</div>
+    <div class="nav-sect">Clients</div>
+    <div class="nav-item" data-page="clients"><i class="ti ti-building"></i> Corporate Clients</div>
+    <div class="nav-item" data-page="reports"><i class="ti ti-chart-bar"></i> Reports</div>
+  </div>
+  <div class="sb-bottom">
+    <div class="user-card">
+      <div class="user-av">SR</div>
+      <div>
+        <div class="user-name">Suresh Recyclers</div>
+        <div class="user-co">Hyderabad · Admin</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+  <div class="topbar">
+    <div class="tb-title" id="tb-title">Dashboard</div>
+    <span class="tb-badge" id="tb-date"></span>
+    <button class="btn btn-green" onclick="openIntakeModal()">
+      <i class="ti ti-plus"></i> New Intake
+    </button>
+  </div>
+
+  <div id="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Total Devices</div>
+          <div class="metric-val">847</div>
+          <div class="metric-sub">All time intake</div>
+        </div>
+        <div class="metric amber">
+          <div class="metric-label">In Processing</div>
+          <div class="metric-val">124</div>
+          <div class="metric-sub">Across 3 batches</div>
+        </div>
+        <div class="metric blue">
+          <div class="metric-label">Wiped & Ready</div>
+          <div class="metric-val">63</div>
+          <div class="metric-sub">Awaiting certificate</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Certs Issued</div>
+          <div class="metric-val">38</div>
+          <div class="metric-sub">This month</div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Batches</span>
+            <button class="btn btn-ghost btn-sm" onclick="nav('intake')">View all</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Batch</th><th>Client</th><th>Devices</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><code>BCH-2406-011</code></td><td>Infosys Ltd</td><td>42</td><td><span class="pill p-certified">Certified</span></td></tr>
+                <tr><td><code>BCH-2406-010</code></td><td>HDFC Bank</td><td>28</td><td><span class="pill p-process">Processing</span></td></tr>
+                <tr><td><code>BCH-2406-009</code></td><td>TCS Hyderabad</td><td>65</td><td><span class="pill p-wiped">Wiped</span></td></tr>
+                <tr><td><code>BCH-2406-008</code></td><td>Wipro Ltd</td><td>19</td><td><span class="pill p-certified">Certified</span></td></tr>
+                <tr><td><code>BCH-2406-007</code></td><td>Apollo Hospitals</td><td>31</td><td><span class="pill p-dispatched">Dispatched</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Live activity</span></div>
+          <div class="card-body" style="padding-top:10px">
+            <ul class="activity-list">
+              <li class="act-item"><div class="act-dot"></div><div><div class="act-main">Certificate issued — Infosys BCH-2406-011</div><div class="act-sub">12 min ago · Ravi Kumar</div></div></li>
+              <li class="act-item"><div class="act-dot" style="background:var(--amber)"></div><div><div class="act-main">Data wipe started — BCH-2406-010 (28 devices)</div><div class="act-sub">1h ago · Priya W</div></div></li>
+              <li class="act-item"><div class="act-dot" style="background:var(--blue)"></div><div><div class="act-main">New intake — TCS 65 laptops logged</div><div class="act-sub">2h ago · Admin</div></div></li>
+              <li class="act-item"><div class="act-dot"></div><div><div class="act-main">Wipe completed — BCH-2406-009 all 65 units</div><div class="act-sub">3h ago · Suresh R</div></div></li>
+              <li class="act-item"><div class="act-dot" style="background:var(--text3)"></div><div><div class="act-main">Apollo Hospitals cert downloaded by client</div><div class="act-sub">Yesterday · Client portal</div></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Pending actions</span>
+          <span class="tag" style="background:var(--amber-dim);color:var(--amber);border-color:rgba(245,166,35,0.2)">3 urgent</span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Batch</th><th>Client</th><th>Devices</th><th>Pending Since</th><th>Action Needed</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>BCH-2406-010</code></td><td>HDFC Bank</td><td>28</td><td>2 days</td>
+                <td><span class="pill p-process">Generate Certificate</span></td>
+                <td><button class="btn btn-green btn-sm" onclick="nav('certificates');toast('Generating certificate for BCH-2406-010')">Generate</button></td>
+              </tr>
+              <tr>
+                <td><code>BCH-2406-009</code></td><td>TCS Hyderabad</td><td>65</td><td>1 day</td>
+                <td><span class="pill p-wiped">Issue Certificate</span></td>
+                <td><button class="btn btn-green btn-sm" onclick="nav('certificates');toast('Certificate ready for BCH-2406-009')">Issue</button></td>
+              </tr>
+              <tr>
+                <td><code>BCH-2406-012</code></td><td>Deloitte India</td><td>14</td><td>Today</td>
+                <td><span class="pill p-intake">Start Processing</span></td>
+                <td><button class="btn btn-sm" onclick="nav('processing')">Process</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ASSET INTAKE ═══ -->
+    <div class="page" id="page-intake">
+      <!-- STEP WIZARD -->
+      <div class="card">
+        <div class="card-body">
+          <div class="steps" id="step-indicator">
+            <div class="step-item">
+              <div class="step-bubble active" id="sb1">1</div>
+              <span class="step-label active" id="sl1">Client Details</span>
+            </div>
+            <div class="step-line" id="sl-1"></div>
+            <div class="step-item">
+              <div class="step-bubble" id="sb2">2</div>
+              <span class="step-label" id="sl2">Asset List</span>
+            </div>
+            <div class="step-line" id="sl-2"></div>
+            <div class="step-item">
+              <div class="step-bubble" id="sb3">3</div>
+              <span class="step-label" id="sl3">Wipe Method</span>
+            </div>
+            <div class="step-line" id="sl-3"></div>
+            <div class="step-item">
+              <div class="step-bubble" id="sb4">4</div>
+              <span class="step-label" id="sl4">Confirm</span>
+            </div>
+          </div>
+
+          <!-- STEP 1 -->
+          <div id="step1">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Corporate Client Name</label>
+                <input type="text" class="form-control" id="s1-client" placeholder="e.g. Infosys Ltd" value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Client Contact Person</label>
+                <input type="text" class="form-control" id="s1-contact" placeholder="Full name">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Contact Email</label>
+                <input type="text" class="form-control" id="s1-email" placeholder="contact@company.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pickup / Intake Date</label>
+                <input type="date" class="form-control" id="s1-date">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Client Address</label>
+                <input type="text" class="form-control" id="s1-address" placeholder="Office address">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Batch Reference (auto)</label>
+                <input type="text" class="form-control" id="s1-batch" readonly style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px">
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end">
+              <button class="btn btn-green" onclick="goStep(2)">Next — Asset List <i class="ti ti-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div id="step2" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-size:12px;color:var(--text2)">Enter each device's serial number and details</div>
+              <button class="btn btn-sm" onclick="addAssetRow()"><i class="ti ti-plus"></i> Add Row</button>
+            </div>
+            <div style="background:var(--surface2);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px">
+              <span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Serial Number</span>
+              <span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Device Type</span>
+              <span style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Make / Model</span>
+              <span></span>
+            </div>
+            <div class="asset-rows" id="asset-rows"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+              <div style="font-size:12px;color:var(--text3)" id="asset-count-label">0 devices added</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm" onclick="goStep(1)"><i class="ti ti-arrow-left"></i> Back</button>
+                <button class="btn btn-green" onclick="goStep(3)">Next — Wipe Method <i class="ti ti-arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div id="step3" style="display:none">
+            <div class="form-group">
+              <label class="form-label">Select Data Destruction Method</label>
+              <div class="wipe-grid">
+                <div class="wipe-option selected" onclick="selectWipe(this,'DoD 5220.22-M (7-pass overwrite)')">
+                  <div class="wipe-option-name">DoD 5220.22-M</div>
+                  <div class="wipe-option-desc">7-pass overwrite. US Dept of Defense standard. Most commonly requested by corporates.</div>
+                </div>
+                <div class="wipe-option" onclick="selectWipe(this,'NIST 800-88 (Purge)')">
+                  <div class="wipe-option-name">NIST 800-88 Purge</div>
+                  <div class="wipe-option-desc">NIST recommended for sensitive government & banking data. High security.</div>
+                </div>
+                <div class="wipe-option" onclick="selectWipe(this,'Single Pass Overwrite')">
+                  <div class="wipe-option-name">Single Pass Overwrite</div>
+                  <div class="wipe-option-desc">Fast and sufficient for non-sensitive data. Good for bulk volumes.</div>
+                </div>
+                <div class="wipe-option" onclick="selectWipe(this,'Physical Destruction (Shredding)')">
+                  <div class="wipe-option-name">Physical Destruction</div>
+                  <div class="wipe-option-desc">Drives physically shredded. Used for non-functional or heavily damaged devices.</div>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="s3-wipe" value="DoD 5220.22-M (7-pass overwrite)">
+            <div class="form-row" style="margin-top:14px">
+              <div class="form-group">
+                <label class="form-label">Assigned Operator</label>
+                <select class="form-control" id="s3-operator">
+                  <option>Ravi Kumar</option><option>Priya W</option><option>Suresh R</option><option>Arjun T</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Expected Completion</label>
+                <input type="date" class="form-control" id="s3-completion">
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px">
+              <button class="btn btn-ghost btn-sm" onclick="goStep(2)"><i class="ti ti-arrow-left"></i> Back</button>
+              <button class="btn btn-green" onclick="goStep(4)">Next — Confirm <i class="ti ti-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div id="step4" style="display:none">
+            <div style="background:var(--green-dim2);border:1px solid rgba(34,201,122,0.15);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px">
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+                <i class="ti ti-check-circle"></i> Batch Summary
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px" id="confirm-summary"></div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.7;padding:12px 14px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border)">
+              <i class="ti ti-info-circle" style="color:var(--blue);margin-right:4px"></i>
+              Confirming this intake will create a batch record, generate a unique tracking ID, and notify the assigned operator. A data destruction certificate will be auto-generated once processing is complete.
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <button class="btn btn-ghost btn-sm" onclick="goStep(3)"><i class="ti ti-arrow-left"></i> Back</button>
+              <button class="btn btn-green" onclick="confirmIntake()"><i class="ti ti-check"></i> Confirm Intake & Create Batch</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXISTING BATCHES -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">All batches</span><span class="tag">12 total</span></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Batch ID</th><th>Client</th><th>Devices</th><th>Wipe Method</th><th>Operator</th><th>Status</th><th>Certificate</th></tr></thead>
+            <tbody>
+              <tr><td><code>BCH-2406-011</code></td><td>Infosys Ltd</td><td>42</td><td>DoD 5220.22-M</td><td>Ravi Kumar</td><td><span class="pill p-certified">Certified</span></td><td><button class="btn btn-green btn-sm" onclick="showCert('Infosys Ltd','BCH-2406-011',42,'DoD 5220.22-M (7-pass overwrite)','Ravi Kumar')"><i class="ti ti-file-certificate"></i> View</button></td></tr>
+              <tr><td><code>BCH-2406-010</code></td><td>HDFC Bank</td><td>28</td><td>NIST 800-88</td><td>Priya W</td><td><span class="pill p-process">Processing</span></td><td><button class="btn btn-sm" disabled style="opacity:.4">Pending</button></td></tr>
+              <tr><td><code>BCH-2406-009</code></td><td>TCS Hyderabad</td><td>65</td><td>DoD 5220.22-M</td><td>Suresh R</td><td><span class="pill p-wiped">Wiped</span></td><td><button class="btn btn-green btn-sm" onclick="showCert('TCS Hyderabad','BCH-2406-009',65,'DoD 5220.22-M (7-pass overwrite)','Suresh R')"><i class="ti ti-file-certificate"></i> Issue</button></td></tr>
+              <tr><td><code>BCH-2406-008</code></td><td>Wipro Ltd</td><td>19</td><td>Single Pass</td><td>Arjun T</td><td><span class="pill p-certified">Certified</span></td><td><button class="btn btn-green btn-sm" onclick="showCert('Wipro Ltd','BCH-2406-008',19,'Single Pass Overwrite','Arjun T')"><i class="ti ti-file-certificate"></i> View</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROCESSING ═══ -->
+    <div class="page" id="page-processing">
+      <div class="g3">
+        <div class="card" style="border-top:2px solid var(--amber)">
+          <div class="card-header"><span class="card-title" style="color:var(--amber)">In Progress</span><span class="tag">2 batches</span></div>
+          <div class="card-body" style="padding:10px">
+            <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;margin-bottom:8px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <code>BCH-2406-010</code><span class="pill p-process">Active</span>
+              </div>
+              <div style="font-size:12px;font-weight:500;margin-bottom:3px">HDFC Bank — 28 devices</div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:10px">NIST 800-88 · Priya W · Day 2 of 3</div>
+              <div style="background:var(--surface3);border-radius:4px;height:4px;overflow:hidden;margin-bottom:8px">
+                <div style="background:var(--amber);height:100%;width:62%;border-radius:4px;transition:width .3s"></div>
+              </div>
+              <div style="font-size:10px;color:var(--text3);display:flex;justify-content:space-between">
+                <span>17 / 28 devices wiped</span><span>62%</span>
+              </div>
+              <button class="btn btn-sm" style="width:100%;margin-top:10px" onclick="toast('BCH-2406-010 marked complete — certificate queued')">Mark Complete</button>
+            </div>
+            <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <code>BCH-2406-012</code><span class="pill p-intake">Starting</span>
+              </div>
+              <div style="font-size:12px;font-weight:500;margin-bottom:3px">Deloitte India — 14 devices</div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:10px">DoD 5220.22-M · Ravi Kumar · Day 1</div>
+              <div style="background:var(--surface3);border-radius:4px;height:4px;overflow:hidden;margin-bottom:8px">
+                <div style="background:var(--blue);height:100%;width:15%;border-radius:4px"></div>
+              </div>
+              <div style="font-size:10px;color:var(--text3);display:flex;justify-content:space-between">
+                <span>2 / 14 devices wiped</span><span>15%</span>
+              </div>
+              <button class="btn btn-sm" style="width:100%;margin-top:10px" onclick="toast('Progress updated for BCH-2406-012')">Update Progress</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="border-top:2px solid var(--green)">
+          <div class="card-header"><span class="card-title" style="color:var(--green)">Wiped — Awaiting Cert</span><span class="tag">1 batch</span></div>
+          <div class="card-body" style="padding:10px">
+            <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <code>BCH-2406-009</code><span class="pill p-wiped">Wiped</span>
+              </div>
+              <div style="font-size:12px;font-weight:500;margin-bottom:3px">TCS Hyderabad — 65 devices</div>
+              <div style="font-size:10px;color:var(--text3);margin-bottom:10px">DoD 5220.22-M · Suresh R · Completed</div>
+              <div style="background:var(--green-dim);border-radius:4px;height:4px;overflow:hidden;margin-bottom:8px">
+                <div style="background:var(--green);height:100%;width:100%;border-radius:4px"></div>
+              </div>
+              <div style="font-size:10px;color:var(--green);display:flex;justify-content:space-between">
+                <span>65 / 65 devices wiped</span><span>100%</span>
+              </div>
+              <button class="btn btn-green btn-sm" style="width:100%;margin-top:10px" onclick="showCert('TCS Hyderabad','BCH-2406-009',65,'DoD 5220.22-M (7-pass overwrite)','Suresh R');nav('certificates')">
+                <i class="ti ti-certificate"></i> Generate Certificate
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="border-top:2px solid var(--text3)">
+          <div class="card-header"><span class="card-title">Completed</span><span class="tag">9 batches</span></div>
+          <div class="card-body" style="padding:10px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);font-size:12px">
+                <div><code style="font-size:10px">BCH-2406-011</code><div style="color:var(--text2);font-size:11px;margin-top:1px">Infosys · 42 devices</div></div>
+                <button class="btn btn-sm btn-ghost" onclick="showCert('Infosys Ltd','BCH-2406-011',42,'DoD 5220.22-M (7-pass overwrite)','Ravi Kumar')"><i class="ti ti-eye"></i></button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);font-size:12px">
+                <div><code style="font-size:10px">BCH-2406-008</code><div style="color:var(--text2);font-size:11px;margin-top:1px">Wipro · 19 devices</div></div>
+                <button class="btn btn-sm btn-ghost" onclick="showCert('Wipro Ltd','BCH-2406-008',19,'Single Pass Overwrite','Arjun T')"><i class="ti ti-eye"></i></button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);font-size:12px">
+                <div><code style="font-size:10px">BCH-2406-007</code><div style="color:var(--text2);font-size:11px;margin-top:1px">Apollo · 31 devices</div></div>
+                <button class="btn btn-sm btn-ghost" onclick="showCert('Apollo Hospitals','BCH-2406-007',31,'NIST 800-88 (Purge)','Priya W')"><i class="ti ti-eye"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CERTIFICATES ═══ -->
+    <div class="page" id="page-certificates">
+      <div class="g2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Generate Certificate</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Select Batch</label>
+              <select class="form-control" id="cert-batch-select" onchange="prefillCert(this.value)">
+                <option value="">— Select a completed batch —</option>
+                <option value="BCH-2406-011|Infosys Ltd|42|DoD 5220.22-M (7-pass overwrite)|Ravi Kumar">BCH-2406-011 — Infosys Ltd (42 devices)</option>
+                <option value="BCH-2406-009|TCS Hyderabad|65|DoD 5220.22-M (7-pass overwrite)|Suresh R">BCH-2406-009 — TCS Hyderabad (65 devices)</option>
+                <option value="BCH-2406-008|Wipro Ltd|19|Single Pass Overwrite|Arjun T">BCH-2406-008 — Wipro Ltd (19 devices)</option>
+                <option value="BCH-2406-007|Apollo Hospitals|31|NIST 800-88 (Purge)|Priya W">BCH-2406-007 — Apollo Hospitals (31 devices)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Certificate Type</label>
+              <select class="form-control" id="cert-type">
+                <option>Data Destruction Certificate</option>
+                <option>Asset Disposal Certificate</option>
+                <option>E-Waste Recycling Certificate</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Company Name (on certificate)</label>
+              <input type="text" class="form-control" id="cert-issuer" value="Suresh E-Waste Recyclers Pvt Ltd">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CPCB Authorization Number</label>
+              <input type="text" class="form-control" id="cert-cpcb" value="CPCB/EW/HYD/2024/00142">
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-green" style="flex:1" onclick="generateCertFromForm()">
+                <i class="ti ti-file-certificate"></i> Generate Certificate
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recently Issued</span></div>
+          <div class="card-body" style="padding:10px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;background:var(--surface2)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <code>CERT-2406-038</code><span class="pill p-certified">Issued</span>
+                </div>
+                <div style="font-size:12px;font-weight:500">Infosys Ltd — 42 laptops</div>
+                <div style="font-size:10px;color:var(--text3);margin:3px 0 8px">DoD 5220.22-M · 06 Jun 2026</div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-sm" style="flex:1" onclick="showCert('Infosys Ltd','BCH-2406-011',42,'DoD 5220.22-M (7-pass overwrite)','Ravi Kumar')"><i class="ti ti-eye"></i> View</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('Certificate downloaded as PDF')"><i class="ti ti-download"></i></button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('Certificate emailed to Infosys contact')"><i class="ti ti-mail"></i></button>
+                </div>
+              </div>
+              <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;background:var(--surface2)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <code>CERT-2406-037</code><span class="pill p-certified">Issued</span>
+                </div>
+                <div style="font-size:12px;font-weight:500">Wipro Ltd — 19 laptops</div>
+                <div style="font-size:10px;color:var(--text3);margin:3px 0 8px">Single Pass · 05 Jun 2026</div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-sm" style="flex:1" onclick="showCert('Wipro Ltd','BCH-2406-008',19,'Single Pass Overwrite','Arjun T')"><i class="ti ti-eye"></i> View</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('Certificate downloaded as PDF')"><i class="ti ti-download"></i></button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('Certificate emailed to Wipro contact')"><i class="ti ti-mail"></i></button>
+                </div>
+              </div>
+              <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;background:var(--surface2)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <code>CERT-2406-036</code><span class="pill p-certified">Issued</span>
+                </div>
+                <div style="font-size:12px;font-weight:500">Apollo Hospitals — 31 devices</div>
+                <div style="font-size:10px;color:var(--text3);margin:3px 0 8px">NIST 800-88 · 04 Jun 2026</div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-sm" style="flex:1" onclick="showCert('Apollo Hospitals','BCH-2406-007',31,'NIST 800-88 (Purge)','Priya W')"><i class="ti ti-eye"></i> View</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('Certificate downloaded as PDF')"><i class="ti ti-download"></i></button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('Emailed to Apollo contact')"><i class="ti ti-mail"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CERTIFICATE PREVIEW -->
+      <div id="cert-preview">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" style="color:var(--green)"><i class="ti ti-certificate" style="margin-right:4px"></i> Certificate Preview</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-ghost" onclick="toast('Opening print dialog...');window.print()"><i class="ti ti-printer"></i> Print</button>
+              <button class="btn btn-sm btn-ghost" onclick="toast('PDF downloaded successfully')"><i class="ti ti-download"></i> Download PDF</button>
+              <button class="btn btn-green btn-sm" onclick="toast('Certificate emailed to client successfully')"><i class="ti ti-mail"></i> Email to Client</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="cert-paper" id="cert-paper">
+              <div class="cert-watermark">VERIFIED</div>
+              <div class="cert-header">
+                <div class="cert-logo-area">
+                  <div class="cert-logo-box">S</div>
+                  <div>
+                    <div class="cert-company" id="cp-issuer">Suresh E-Waste Recyclers Pvt Ltd</div>
+                    <div class="cert-co-tag">CPCB Authorized E-Waste Recycler · <span id="cp-cpcb">CPCB/EW/HYD/2024/00142</span></div>
+                  </div>
+                </div>
+                <div class="cert-id-box">
+                  <div class="cert-id" id="cp-cert-id">CERT-2406-038</div>
+                  <div class="cert-date" id="cp-date">Issued: 08 June 2026</div>
+                </div>
+              </div>
+              <div class="cert-title-area">
+                <div class="cert-badge"><i class="ti ti-shield-check" style="font-size:11px"></i> Certified & Verified</div>
+                <div class="cert-main-title" id="cp-cert-type">Data Destruction Certificate</div>
+                <div class="cert-sub">This certifies that all data-bearing devices listed herein have been processed in accordance with the specified standard</div>
+              </div>
+              <div class="cert-meta-grid">
+                <div class="cert-meta-item"><div class="cert-meta-label">Client Organization</div><div class="cert-meta-value" id="cp-client">Infosys Ltd</div></div>
+                <div class="cert-meta-item"><div class="cert-meta-label">Batch Reference</div><div class="cert-meta-value" id="cp-batch" style="font-family:'JetBrains Mono',monospace;font-size:11px">BCH-2406-011</div></div>
+                <div class="cert-meta-item"><div class="cert-meta-label">Destruction Method</div><div class="cert-meta-value" id="cp-wipe">DoD 5220.22-M (7-pass overwrite)</div></div>
+                <div class="cert-meta-item"><div class="cert-meta-label">Total Devices Processed</div><div class="cert-meta-value" id="cp-count">42 units</div></div>
+                <div class="cert-meta-item"><div class="cert-meta-label">Authorized Operator</div><div class="cert-meta-value" id="cp-operator">Ravi Kumar</div></div>
+                <div class="cert-meta-item"><div class="cert-meta-label">Processing Date</div><div class="cert-meta-value" id="cp-proc-date">06 June 2026</div></div>
+              </div>
+              <div class="cert-assets-title">Device Register</div>
+              <table class="cert-asset-table" id="cp-asset-table">
+                <thead><tr><th>#</th><th>Serial Number</th><th>Device Type</th><th>Make / Model</th><th>Status</th></tr></thead>
+                <tbody id="cp-asset-tbody"></tbody>
+              </table>
+              <div class="cert-compliance">
+                <strong>Compliance Statement:</strong> This certificate confirms that all devices listed above have undergone secure data destruction as per the stated methodology. This process is compliant with the E-Waste (Management) Rules 2022, IT Act 2000 (Section 43A), and applicable CPCB guidelines. All residual materials have been disposed of through authorized e-waste processing channels. This document serves as the official record of data destruction for audit and compliance purposes.
+              </div>
+              <div class="cert-footer">
+                <div class="cert-sign-box">
+                  <div style="height:30px"></div>
+                  <div class="cert-sign-line"></div>
+                  <div class="cert-sign-name" id="cp-sign-operator">Ravi Kumar</div>
+                  <div class="cert-sign-role">Authorized Operator</div>
+                </div>
+                <div class="cert-sign-box">
+                  <div style="height:30px"></div>
+                  <div class="cert-sign-line"></div>
+                  <div class="cert-sign-name" id="cp-sign-issuer">Suresh Reddy</div>
+                  <div class="cert-sign-role">Director, Suresh E-Waste Recyclers</div>
+                </div>
+                <div class="cert-sign-box">
+                  <div style="height:30px"></div>
+                  <div class="cert-sign-line"></div>
+                  <div class="cert-sign-name">Company Seal</div>
+                  <div class="cert-sign-role">CPCB Authorized</div>
+                </div>
+              </div>
+              <div class="cert-verify">
+                <i class="ti ti-qrcode" style="font-size:18px;color:var(--green)"></i>
+                <span class="cert-verify-text">Scan QR or visit cleartrace.in/verify to authenticate this certificate</span>
+                <span class="cert-verify-code" id="cp-verify-code">VRF-A7X2-9KP4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENTS ═══ -->
+    <div class="page" id="page-clients">
+      <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric"><div class="metric-label">Total Clients</div><div class="metric-val">11</div></div>
+        <div class="metric amber"><div class="metric-label">Active This Month</div><div class="metric-val">6</div></div>
+        <div class="metric blue"><div class="metric-label">Devices This Month</div><div class="metric-val">249</div></div>
+        <div class="metric"><div class="metric-label">Certs Issued</div><div class="metric-val">38</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Corporate clients</span>
+          <button class="btn btn-green btn-sm" onclick="toast('New client form opened')"><i class="ti ti-plus"></i> Add Client</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Company</th><th>Sector</th><th>Contact</th><th>Devices (Total)</th><th>Last Batch</th><th>Certs</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Infosys Ltd</strong></td><td>IT Services</td><td>Anil Sharma</td><td>186</td><td>06 Jun 2026</td><td>8</td><td><button class="btn btn-sm" onclick="toast('Opening Infosys client portal')"><i class="ti ti-external-link"></i> Portal</button></td></tr>
+              <tr><td><strong>HDFC Bank</strong></td><td>Banking</td><td>Priya Nair</td><td>94</td><td>04 Jun 2026</td><td>4</td><td><button class="btn btn-sm" onclick="toast('Opening HDFC client portal')"><i class="ti ti-external-link"></i> Portal</button></td></tr>
+              <tr><td><strong>TCS Hyderabad</strong></td><td>IT Services</td><td>Rajan M</td><td>212</td><td>05 Jun 2026</td><td>9</td><td><button class="btn btn-sm" onclick="toast('Opening TCS client portal')"><i class="ti ti-external-link"></i> Portal</button></td></tr>
+              <tr><td><strong>Wipro Ltd</strong></td><td>IT Services</td><td>Kavya R</td><td>76</td><td>05 Jun 2026</td><td>4</td><td><button class="btn btn-sm" onclick="toast('Opening Wipro client portal')"><i class="ti ti-external-link"></i> Portal</button></td></tr>
+              <tr><td><strong>Apollo Hospitals</strong></td><td>Healthcare</td><td>Dr. Mehta</td><td>68</td><td>04 Jun 2026</td><td>3</td><td><button class="btn btn-sm" onclick="toast('Opening Apollo portal')"><i class="ti ti-external-link"></i> Portal</button></td></tr>
+              <tr><td><strong>Deloitte India</strong></td><td>Consulting</td><td>Sandeep K</td><td>42</td><td>Today</td><td>2</td><td><button class="btn btn-sm" onclick="toast('Opening Deloitte portal')"><i class="ti ti-external-link"></i> Portal</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div class="page" id="page-reports">
+      <div class="g2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Monthly summary — June 2026</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+              <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">DEVICES PROCESSED</div><div style="font-size:20px;font-weight:700">249</div></div>
+              <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">CERTS ISSUED</div><div style="font-size:20px;font-weight:700">38</div></div>
+              <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">DATA WIPED (TB)</div><div style="font-size:20px;font-weight:700">12.4</div></div>
+              <div style="background:var(--surface2);border-radius:var(--radius);padding:12px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">ACTIVE CLIENTS</div><div style="font-size:20px;font-weight:700">6</div></div>
+            </div>
+            <button class="btn btn-green" style="width:100%" onclick="toast('Monthly PDF report downloaded')"><i class="ti ti-download"></i> Download Monthly Report</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">EPR Compliance Summary</span><span class="tag" style="background:var(--green-dim);color:var(--green);border-color:rgba(34,201,122,0.2)">On Track</span></div>
+          <div class="card-body">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">E-Waste (Management) Rules 2022 compliance status for FY 2026-27</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="color:var(--text2)">Annual target (devices)</span><span style="color:var(--text);font-weight:600">2,400 / 3,000</span></div><div style="background:var(--surface3);border-radius:4px;height:6px"><div style="background:var(--green);height:100%;width:80%;border-radius:4px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="color:var(--text2)">Certificates filed to CPCB</span><span style="color:var(--text);font-weight:600">38 / 40</span></div><div style="background:var(--surface3);border-radius:4px;height:6px"><div style="background:var(--blue);height:100%;width:95%;border-radius:4px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="color:var(--text2)">Hazardous material disposal docs</span><span style="color:var(--amber);font-weight:600">6 / 8 pending</span></div><div style="background:var(--surface3);border-radius:4px;height:6px"><div style="background:var(--amber);height:100%;width:75%;border-radius:4px"></div></div></div>
+            </div>
+            <button class="btn btn-sm" style="width:100%;margin-top:14px" onclick="toast('EPR report generated for CPCB submission')"><i class="ti ti-file-export"></i> Export for CPCB Filing</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- QUICK INTAKE MODAL -->
+<div class="overlay" id="intake-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Quick Asset Intake</span>
+      <button class="btn btn-sm btn-ghost" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Client Name</label><input type="text" class="form-control" placeholder="e.g. Infosys Ltd"></div>
+        <div class="form-group"><label class="form-label">No. of Devices</label><input type="number" class="form-control" placeholder="e.g. 42"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Device Type</label><select class="form-control"><option>Laptop</option><option>Desktop</option><option>Server</option><option>Mixed</option></select></div>
+        <div class="form-group"><label class="form-label">Wipe Standard</label><select class="form-control"><option>DoD 5220.22-M</option><option>NIST 800-88</option><option>Single Pass</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Client Contact Email</label><input type="text" class="form-control" placeholder="contact@company.com"></div>
+      <div style="background:var(--green-dim2);border:1px solid rgba(34,201,122,0.15);border-radius:var(--radius);padding:10px 12px;font-size:11px;color:var(--text2);line-height:1.6">
+        <i class="ti ti-info-circle" style="color:var(--green);margin-right:4px"></i>
+        A data destruction certificate will be automatically generated and emailed to the client once processing is complete.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-green" onclick="quickIntake()"><i class="ti ti-check"></i> Create Batch</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><i class="ti ti-check-circle t-icon"></i><span id="toast-msg">Done</span></div>
+
+<script>
+// ── NAV ──
+const pageNames={dashboard:'Dashboard',intake:'Asset Intake',processing:'Processing',certificates:'Certificates',clients:'Corporate Clients',reports:'Reports & Compliance'};
+function nav(p){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector(`[data-page="${p}"]`).classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tb-title').textContent=pageNames[p];
+}
+document.querySelectorAll('.nav-item[data-page]').forEach(el=>el.addEventListener('click',()=>nav(el.dataset.page)));
+
+// ── DATE ──
+const now=new Date();
+document.getElementById('tb-date').textContent=now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+document.getElementById('s1-date').value=now.toISOString().split('T')[0];
+document.getElementById('s3-completion').value=new Date(now.getTime()+3*86400000).toISOString().split('T')[0];
+function genBatchId(){const d=now;return`BCH-${String(d.getFullYear()).slice(2)}${String(d.getMonth()+1).padStart(2,'0')}-${String(Math.floor(Math.random()*900)+100)}`;}
+document.getElementById('s1-batch').value=genBatchId();
+
+// ── INTAKE WIZARD ──
+let currentStep=1;
+let selectedWipe='DoD 5220.22-M (7-pass overwrite)';
+let assetRows=[];
+
+function goStep(n){
+  document.getElementById('step'+currentStep).style.display='none';
+  currentStep=n;
+  document.getElementById('step'+n).style.display='block';
+  for(let i=1;i<=4;i++){
+    const b=document.getElementById('sb'+i);
+    const l=document.getElementById('sl'+i);
+    const line=document.getElementById('sl-'+i);
+    b.className='step-bubble'+(i<n?' done':i===n?' active':'');
+    l.className='step-label'+(i<n?' done':i===n?' active':'');
+    if(line)line.className='step-line'+(i<n?' done':'');
+    if(i<n)b.innerHTML='<i class="ti ti-check" style="font-size:11px"></i>';
+    else if(i===n||!b.innerHTML.includes('ti-check'))b.textContent=i;
+  }
+  if(n===4)buildConfirm();
+}
+
+function addAssetRow(){
+  const id='ar-'+Date.now();
+  assetRows.push(id);
+  const div=document.createElement('div');
+  div.className='asset-row';div.id=id;
+  div.innerHTML=`
+    <input type="text" class="form-control" placeholder="SN-XXXXXXX" oninput="updateCount()">
+    <select class="form-control"><option>Laptop</option><option>Desktop</option><option>Server</option><option>Mobile</option></select>
+    <input type="text" class="form-control" placeholder="Dell Latitude 5420">
+    <button class="remove-btn" onclick="removeRow('${id}')"><i class="ti ti-x" style="font-size:12px"></i></button>`;
+  document.getElementById('asset-rows').appendChild(div);
+  updateCount();
+}
+function removeRow(id){
+  document.getElementById(id).remove();
+  assetRows=assetRows.filter(r=>r!==id);
+  updateCount();
+}
+function updateCount(){
+  const n=document.getElementById('asset-rows').querySelectorAll('.asset-row').length;
+  document.getElementById('asset-count-label').textContent=n+' device'+(n!==1?'s':'')+' added';
+}
+function selectWipe(el,val){
+  document.querySelectorAll('.wipe-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedWipe=val;
+  document.getElementById('s3-wipe').value=val;
+}
+function buildConfirm(){
+  const rows=document.getElementById('asset-rows').querySelectorAll('.asset-row');
+  const summary=document.getElementById('confirm-summary');
+  const items=[
+    ['Client',document.getElementById('s1-client').value||'—'],
+    ['Contact Email',document.getElementById('s1-email').value||'—'],
+    ['Batch ID',document.getElementById('s1-batch').value],
+    ['Intake Date',document.getElementById('s1-date').value],
+    ['Devices Added',rows.length+' units'],
+    ['Wipe Method',selectedWipe],
+    ['Operator',document.getElementById('s3-operator').value],
+    ['Est. Completion',document.getElementById('s3-completion').value],
+  ];
+  summary.innerHTML=items.map(([l,v])=>`
+    <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">${l}</div><div style="font-size:12px;font-weight:500;color:var(--text)">${v}</div></div>`).join('');
+}
+function confirmIntake(){
+  toast('Batch '+document.getElementById('s1-batch').value+' created — operator notified');
+  setTimeout(()=>nav('processing'),800);
+}
+
+// ── ADD 3 ROWS BY DEFAULT ──
+addAssetRow();addAssetRow();addAssetRow();
+
+// ── CERTIFICATE ──
+const SAMPLE_SERIALS={
+  42:['DL-XYZ123','DL-XYZ124','DL-XYZ125','HP-ABR441','HP-ABR442','LN-KKP221','LN-KKP222','DL-XYZ126','HP-ABR443','DL-XYZ127'],
+  65:['TC-001','TC-002','TC-003','TC-004','TC-005','TC-006','TC-007','TC-008','TC-009','TC-010'],
+  19:['WP-A1','WP-A2','WP-A3','WP-A4','WP-A5','WP-A6','WP-A7','WP-A8','WP-A9','WP-A10'],
+  31:['AP-01','AP-02','AP-03','AP-04','AP-05','AP-06','AP-07','AP-08','AP-09','AP-10'],
+  14:['DL-B1','DL-B2','DL-B3','DL-B4','DL-B5','DL-B6','DL-B7','DL-B8','DL-B9','DL-B10'],
+};
+const MODELS=['Dell Latitude 5420','HP EliteBook 840','Lenovo ThinkPad X1','Dell XPS 13','HP ProBook 450'];
+function randModel(){return MODELS[Math.floor(Math.random()*MODELS.length)];}
+
+function showCert(client,batch,count,wipe,operator){
+  nav('certificates');
+  const certNum='CERT-2406-0'+Math.floor(Math.random()*9+30);
+  const verifyCode='VRF-'+Math.random().toString(36).slice(2,6).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+  document.getElementById('cp-issuer').textContent=document.getElementById('cert-issuer').value||'Suresh E-Waste Recyclers Pvt Ltd';
+  document.getElementById('cp-cpcb').textContent=document.getElementById('cert-cpcb').value||'CPCB/EW/HYD/2024/00142';
+  document.getElementById('cp-cert-id').textContent=certNum;
+  document.getElementById('cp-date').textContent='Issued: '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('cp-cert-type').textContent=document.getElementById('cert-type')?.value||'Data Destruction Certificate';
+  document.getElementById('cp-client').textContent=client;
+  document.getElementById('cp-batch').textContent=batch;
+  document.getElementById('cp-wipe').textContent=wipe;
+  document.getElementById('cp-count').textContent=count+' units';
+  document.getElementById('cp-operator').textContent=operator;
+  document.getElementById('cp-proc-date').textContent=new Date(Date.now()-86400000).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('cp-sign-operator').textContent=operator;
+  document.getElementById('cp-verify-code').textContent=verifyCode;
+  const serials=SAMPLE_SERIALS[count]||SAMPLE_SERIALS[42];
+  const shown=serials.slice(0,10);
+  const tbody=document.getElementById('cp-asset-tbody');
+  tbody.innerHTML=shown.map((s,i)=>`<tr><td>${i+1}</td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">${s}</td><td>Laptop</td><td>${randModel()}</td><td style="color:#16A05E;font-weight:600">✓ Wiped</td></tr>`).join('');
+  if(count>10){tbody.innerHTML+=`<tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;padding:8px">... and ${count-10} more devices (see full register in attached PDF)</td></tr>`;}
+  document.getElementById('cert-preview').style.display='block';
+  setTimeout(()=>document.getElementById('cert-preview').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function prefillCert(val){
+  if(!val)return;
+  const[batch,client,count,wipe,operator]=val.split('|');
+  showCert(client,batch,parseInt(count),wipe,operator);
+}
+function generateCertFromForm(){
+  const sel=document.getElementById('cert-batch-select').value;
+  if(!sel){toast('Please select a batch first');return;}
+  const[batch,client,count,wipe,operator]=sel.split('|');
+  showCert(client,batch,parseInt(count),wipe,operator);
+  toast('Certificate generated successfully');
+}
+
+// ── MODAL ──
+function openIntakeModal(){document.getElementById('intake-modal').classList.add('open')}
+function closeModal(){document.getElementById('intake-modal').classList.remove('open')}
+function quickIntake(){closeModal();toast('New batch created — added to processing queue');nav('processing')}
+
+// ── TOAST ──
+let toastT;
+function toast(msg){
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast').classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>document.getElementById('toast').classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
